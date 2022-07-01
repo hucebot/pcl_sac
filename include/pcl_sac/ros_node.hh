@@ -11,7 +11,7 @@ namespace pcl_sac
   class RosNode
   {
   public:
-    RosNode(int max_planes = -1, bool publish_cloud = false, bool verbose = false);
+    RosNode(const Params& params, bool publish_cloud = false);
     void cloud_cb(const sensor_msgs::PointCloud2ConstPtr &input);
     const PclSAC &pcl_sac() const { return _pcl_sac; }
 

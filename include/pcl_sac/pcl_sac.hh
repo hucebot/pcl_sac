@@ -17,12 +17,21 @@
 
 namespace pcl_sac
 {
+    struct Params {
+        int verbose = 1; // 0, 1, 2
+        int max_planes = -1;
+        std::vector<float> leaf_size = { 0.10f, 0.10f, 0.06f }; 
+        int num_threads = 8;
+        double distance_threshold = 0.03;
+        int max_iterations = 15000;
+    };
+
     class PclSAC
     {
     public:
         using color_cloud_t = pcl::PointCloud<pcl::PointXYZRGB>;
         using cloud_t = pcl::PointCloud<pcl::PointXYZ>;
-        PclSAC(int max_planes = -1, bool verbose = false);
+        PclSAC(const Params& params = Params());
 
         void update(cloud_t::Ptr cloud);
         // list of planes
@@ -33,7 +42,7 @@ namespace pcl_sac
         const std::vector<pcl::ModelCoefficients> &planes_coefficients() const { return _planes_coefficients; }
 
     protected:
-        int _max_planes = -1;
+        Params _params;
         std::vector<pcl::PointCloud<pcl::PointXYZRGB>> _planes;
         std::vector<pcl::ModelCoefficients> _planes_coefficients;
         pcl::PointCloud<pcl::PointXYZRGB>::Ptr _colored_cloud{new pcl::PointCloud<pcl::PointXYZRGB>};
@@ -55,7 +64,6 @@ namespace pcl_sac
         color_t _get_color(const pcl::ModelCoefficients &coeffs);
 
         pcl_sac::Timer _timer;
-        bool _verbose;
     };
 }
 #endif

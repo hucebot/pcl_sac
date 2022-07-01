@@ -9,19 +9,18 @@
 
 namespace pcl_sac
 {
-  PclSAC::PclSAC(int max_planes, bool verbose) : _max_planes(max_planes), _verbose(verbose)
+  PclSAC::PclSAC(const Params& params) : _params(params)
   {
-    std::cout<<"verbose:"<<verbose<<std::endl;
     // resampling
-    _resampler.setLeafSize(0.10f, 0.10f, 0.05f);
+    _resampler.setLeafSize(_params.leaf_size[0], _params.leaf_size[1],_params.leaf_size[2]);
 
     // segmentation object
     _seg.setOptimizeCoefficients(true);
     _seg.setModelType(pcl::SACMODEL_PLANE);
     _seg.setMethodType(pcl::SAC_RANSAC);
-    _seg.setMaxIterations(2000);
-    _seg.setDistanceThreshold(0.06);
-    _seg.setNumberOfThreads(8);
+    _seg.setMaxIterations(_params.max_iterations);
+    _seg.setDistanceThreshold(_params.distance_threshold);
+    _seg.setNumberOfThreads(_params.num_threads);
 
     // extract a plane from the cloud
     _extractor.setNegative(true);
@@ -38,14 +37,17 @@ namespace pcl_sac
     // downsample
     _timer.begin("downsampling");
     _resampler.setInputCloud(cloud);
-    _resampler.setLeafSize(0.10f, 0.10f, 0.05f);
     _resampler.filter(*_cloud_filtered);
     _timer.end("downsampling");
+
+    if (_params.verbose > 1)
+      std::cout<<"downsampling from " << cloud->size() << " to " << _cloud_filtered->size() << " points" << std::endl;
+
 
     // main loop
     _timer.begin("ransac");
     size_t n_points = _cloud_filtered->size();
-    while (_cloud_filtered->size() > 0.25 * n_points && (_max_planes == -1 || _planes.size() < _max_planes))
+    while (_cloud_filtered->size() > 0.25 * n_points && (_params.max_planes == -1 || _planes.size() < _params.max_planes))
     {
       pcl::ModelCoefficients coefficients;
       _seg.setInputCloud(_cloud_filtered);
@@ -78,8 +80,10 @@ namespace pcl_sac
       _tmp_cloud.swap(_cloud_filtered);
     }
     _timer.end("ransac");
-    if (_verbose)
-      _timer.report();
+    if (_params.verbose > 1)
+      std::cout<<"found " << _planes.size() << " planes with " << _colored_cloud->size()<< " points" << std::endl;
+    if (_params.verbose)
+      _timer.report(std::cout, 0, 10);
   }
 
   PclSAC::color_t PclSAC::_get_color(const pcl::ModelCoefficients &coeffs)

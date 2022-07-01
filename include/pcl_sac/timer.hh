@@ -30,7 +30,8 @@ namespace pcl_sac
                 it->second.max_time = std::max(t, it->second.max_time);
             }
         }
-        void report() {
+        void report()
+        {
             report(std::cout, 0, -1, '\t');
         }
         // with period = -1, we do not update the counter (to report in several streams)
@@ -48,13 +49,13 @@ namespace pcl_sac
             double total = 0;
             for (auto &x : _data)
                 total += x.second.time;
-            oss << "tot.:" << total / 1000 << " ms" << separator;
+            oss << "tot.:" << total / 1000 / _k << " ms" << separator;
             for (auto &x : _data)
             { // display in ms
                 oss.precision(3);
                 oss << x.first
-                    << std::fixed 
-                    << ":" << (x.second.time) / 1000.0 << "ms"
+                    << std::fixed
+                    << ":" << (x.second.time) / 1000.0 / _k << "ms"
                     << " [" << x.second.min_time / 1000.0 << ":" << x.second.max_time / 1000.0 << "]"
                     << separator;
             }
