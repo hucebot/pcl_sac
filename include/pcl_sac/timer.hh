@@ -1,3 +1,6 @@
+#ifndef PCL_SAC_TIMER_HH
+#define PCL_SAC_TIMER_HH
+
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -74,4 +77,5 @@ namespace pcl_sac
         std::unordered_map<std::string, time_t> _start;
         std::unordered_map<std::string, info_t> _data;
     };
-} // namespace inria_wbc
+} // namespace pcl_sac
+#endif

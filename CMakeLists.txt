@@ -136,7 +136,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/pcl_sac_node.cpp)
 
-add_executable(pcl_sac src/pcl_sac.cc)
+add_executable(pcl_sac src/pcl_sac.cc src/ros_node.cc)
 target_link_libraries(pcl_sac ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
